@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #1f2937;
+  --card: #f9fafb;
+  --border: #e5e7eb;
+  --muted: #6b7280;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --card: #1e293b;
+  --border: #334155;
+  --muted: #94a3b8;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-border-base: var(--border);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Section colors */
+  --color-section-blue-bg: #eff6ff;
+  --color-section-blue-header: #3b82f6;
+  --color-section-blue-border: #bfdbfe;
+
+  --color-section-purple-bg: #f5f3ff;
+  --color-section-purple-header: #8b5cf6;
+  --color-section-purple-border: #ddd6fe;
+
+  --color-section-green-bg: #f0fdf4;
+  --color-section-green-header: #22c55e;
+  --color-section-green-border: #bbf7d0;
+
+  --color-section-amber-bg: #fffbeb;
+  --color-section-amber-header: #f59e0b;
+  --color-section-amber-border: #fde68a;
+
+  --color-section-orange-bg: #fff7ed;
+  --color-section-orange-header: #f97316;
+  --color-section-orange-border: #fed7aa;
+
+  --color-section-red-bg: #fef2f2;
+  --color-section-red-header: #ef4444;
+  --color-section-red-border: #fecaca;
+
+  --color-section-cyan-bg: #ecfeff;
+  --color-section-cyan-header: #06b6d4;
+  --color-section-cyan-border: #a5f3fc;
+
+  --color-section-gray-bg: #f9fafb;
+  --color-section-gray-header: #6b7280;
+  --color-section-gray-border: #e5e7eb;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Keyboard key styling */
+kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: #374151;
+  background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* Print styles */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 8mm;
+  }
+
+  body {
+    font-size: 10px;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .section-card {
+    break-inside: avoid;
+  }
+
+  .item-row {
+    break-inside: avoid;
+  }
+}
