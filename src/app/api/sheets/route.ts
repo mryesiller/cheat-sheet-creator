@@ -56,7 +56,7 @@ export async function GET() {
   if (rate.limited) {
     return NextResponse.json(
       {
-        error: `Çok hızlı istek gönderiyorsunuz. ${rate.retryAfterSeconds} saniye sonra tekrar deneyin.`,
+        error: `Too many requests. Please try again in ${rate.retryAfterSeconds} seconds.`,
         code: "RATE_LIMIT_EXCEEDED",
       },
       {
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
   if (rate.limited) {
     return NextResponse.json(
       {
-        error: `Çok hızlı istek gönderiyorsunuz. ${rate.retryAfterSeconds} saniye sonra tekrar deneyin.`,
+        error: `Too many requests. Please try again in ${rate.retryAfterSeconds} seconds.`,
         code: "RATE_LIMIT_EXCEEDED",
       },
       {
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Ücretsiz planda en fazla 3 cheat sheet oluşturabilirsiniz. Yeni oluşturmak için bir tanesini silin.",
+          "You can create up to 3 cheat sheets on the free plan. Delete one to create a new sheet.",
         code: "SHEET_LIMIT_REACHED",
         limit: MAX_SHEETS_PER_USER,
       },

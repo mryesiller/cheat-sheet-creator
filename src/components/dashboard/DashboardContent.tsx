@@ -63,7 +63,7 @@ export default function DashboardContent({
 
   async function handleCreate() {
     if (limitReached) {
-      const message = `Ücretsiz planda en fazla ${MAX_SHEETS_PER_USER} cheat sheet oluşturabilirsiniz.`;
+      const message = `You can create up to ${MAX_SHEETS_PER_USER} cheat sheets on the free plan.`;
       setActionError(message);
       showToast("info", message);
       return;
@@ -81,7 +81,10 @@ export default function DashboardContent({
       if (!res.ok || !payload?.id) {
         throw new Error(payload?.error || "Failed to create cheat sheet.");
       }
-      showToast("success", "Cheat sheet oluşturuldu. Editöre yönlendiriliyorsunuz...");
+      showToast(
+        "success",
+        "Cheat sheet created. Redirecting to the editor..."
+      );
       router.push(`/editor/${payload.id}`);
     } catch (error) {
       const message =
@@ -95,7 +98,7 @@ export default function DashboardContent({
 
   async function handleUseTemplate(templateId: string) {
     if (limitReached) {
-      const message = `Ücretsiz planda en fazla ${MAX_SHEETS_PER_USER} cheat sheet oluşturabilirsiniz.`;
+      const message = `You can create up to ${MAX_SHEETS_PER_USER} cheat sheets on the free plan.`;
       setActionError(message);
       showToast("info", message);
       return;
@@ -120,7 +123,7 @@ export default function DashboardContent({
       if (!res.ok || !payload?.id) {
         throw new Error(payload?.error || "Failed to create from template.");
       }
-      showToast("success", `${template.name} şablonu eklendi.`);
+      showToast("success", `${template.name} template was added.`);
       router.push(`/editor/${payload.id}`);
     } catch (error) {
       const message =
@@ -153,7 +156,7 @@ export default function DashboardContent({
         const payload = await res.json().catch(() => null);
         throw new Error(payload?.error || "Failed to delete cheat sheet.");
       }
-      showToast("success", "Cheat sheet silindi.");
+      showToast("success", "Cheat sheet deleted.");
       router.refresh();
     } catch (error) {
       setSheetList(previousSheets);
@@ -170,7 +173,7 @@ export default function DashboardContent({
     const url = `${window.location.origin}/sheet/${slug}`;
     await navigator.clipboard.writeText(url);
     setCopied(slug);
-    showToast("success", "Paylaşım linki panoya kopyalandı.");
+    showToast("success", "Share link copied to clipboard.");
     setTimeout(() => setCopied(null), 2000);
   }
 
@@ -195,8 +198,8 @@ export default function DashboardContent({
       )}
 
       <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-        Free plan limiti: en fazla <strong>{MAX_SHEETS_PER_USER}</strong> cheat sheet
-        oluşturabilirsiniz. Şu an: <strong>{sheetList.length}</strong> /{" "}
+        Free plan limit: up to <strong>{MAX_SHEETS_PER_USER}</strong> cheat sheets.
+        Current usage: <strong>{sheetList.length}</strong> /{" "}
         {MAX_SHEETS_PER_USER}
       </div>
 
@@ -343,22 +346,22 @@ export default function DashboardContent({
             onClick={() => setPendingDeleteId(null)}
           />
           <div className="relative w-full max-w-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 shadow-xl">
-            <h3 className="text-base font-semibold mb-2">Cheat sheet silinsin mi?</h3>
+            <h3 className="text-base font-semibold mb-2">Delete this cheat sheet?</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              Bu işlem geri alınamaz.
+              This action cannot be undone.
             </p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setPendingDeleteId(null)}
                 className="cursor-pointer px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
               >
-                Vazgeç
+                Cancel
               </button>
               <button
                 onClick={confirmDelete}
                 className="cursor-pointer px-3 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700"
               >
-                Sil
+                Delete
               </button>
             </div>
           </div>

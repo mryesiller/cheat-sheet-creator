@@ -40,7 +40,7 @@ export default function EditorCanvas({
     isDirty,
     save,
   } = useEditorStore();
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(true);
 
   // Initialize store on mount
   useEffect(() => {

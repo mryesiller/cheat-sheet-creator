@@ -53,7 +53,7 @@ export async function GET(
   if (rate.limited) {
     return NextResponse.json(
       {
-        error: `Çok hızlı istek gönderiyorsunuz. ${rate.retryAfterSeconds} saniye sonra tekrar deneyin.`,
+        error: `Too many requests. Please try again in ${rate.retryAfterSeconds} seconds.`,
         code: "RATE_LIMIT_EXCEEDED",
       },
       {
@@ -108,7 +108,7 @@ export async function PUT(
   if (rate.limited) {
     return NextResponse.json(
       {
-        error: `Çok hızlı istek gönderiyorsunuz. ${rate.retryAfterSeconds} saniye sonra tekrar deneyin.`,
+        error: `Too many requests. Please try again in ${rate.retryAfterSeconds} seconds.`,
         code: "RATE_LIMIT_EXCEEDED",
       },
       {
@@ -293,7 +293,7 @@ export async function DELETE(
   if (rate.limited) {
     return NextResponse.json(
       {
-        error: `Çok hızlı istek gönderiyorsunuz. ${rate.retryAfterSeconds} saniye sonra tekrar deneyin.`,
+        error: `Too many requests. Please try again in ${rate.retryAfterSeconds} seconds.`,
         code: "RATE_LIMIT_EXCEEDED",
       },
       {
