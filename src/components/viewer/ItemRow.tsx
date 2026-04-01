@@ -7,6 +7,29 @@ interface ItemRowProps {
   isDark?: boolean;
 }
 
+function convertMacShortcutToWindows(shortcut: string): string {
+  return shortcut
+    .replaceAll("⌘", "Ctrl")
+    .replaceAll("⌥", "Alt")
+    .replaceAll("⌃", "Ctrl")
+    .replaceAll("⇧", "Shift")
+    .replaceAll("↑", "Up")
+    .replaceAll("↓", "Down")
+    .replaceAll("←", "Left")
+    .replaceAll("→", "Right");
+}
+
+function convertWindowsShortcutToMac(shortcut: string): string {
+  return shortcut
+    .replace(/\bCtrl\b/g, "⌘")
+    .replace(/\bAlt\b/g, "⌥")
+    .replace(/\bShift\b/g, "⇧")
+    .replace(/\bUp\b/g, "↑")
+    .replace(/\bDown\b/g, "↓")
+    .replace(/\bLeft\b/g, "←")
+    .replace(/\bRight\b/g, "→");
+}
+
 export default function ItemRow({ item, activeToggleValues, isDark = false }: ItemRowProps) {
   // Apply variant overrides
   let keyText = item.key_text;
@@ -23,6 +46,15 @@ export default function ItemRow({ item, activeToggleValues, isDark = false }: It
           valueText = options[activeValue].value_text!;
         }
       }
+    }
+  }
+
+  // Fallback OS transform for templates without explicit item.variants
+  if (!item.variants?.os) {
+    if (activeToggleValues.os === "windows") {
+      keyText = convertMacShortcutToWindows(keyText);
+    } else if (activeToggleValues.os === "mac") {
+      keyText = convertWindowsShortcutToMac(keyText);
     }
   }
 

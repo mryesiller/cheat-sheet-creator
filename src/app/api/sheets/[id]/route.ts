@@ -4,6 +4,10 @@ import {
   parseUpdateSheetBody,
   ValidationError,
 } from "@/lib/api/sheet-validation";
+import { enforceRateLimit } from "@/lib/api/rate-limit";
+
+const READ_RATE_LIMIT = { maxRequests: 240, windowMs: 60_000 } as const;
+const WRITE_RATE_LIMIT = { maxRequests: 90, windowMs: 60_000 } as const;
 
 function sortSheetContent(sheet: {
   sections?: Array<{
@@ -40,6 +44,25 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const rate = await enforceRateLimit(
+    supabase,
+    user.id,
+    "sheets:get",
+    READ_RATE_LIMIT
+  );
+  if (rate.limited) {
+    return NextResponse.json(
+      {
+        error: `Çok hızlı istek gönderiyorsunuz. ${rate.retryAfterSeconds} saniye sonra tekrar deneyin.`,
+        code: "RATE_LIMIT_EXCEEDED",
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rate.retryAfterSeconds) },
+      }
+    );
+  }
+
   const { data: sheet, error } = await supabase
     .from("cheat_sheets")
     .select(
@@ -74,6 +97,25 @@ export async function PUT(
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rate = await enforceRateLimit(
+    supabase,
+    user.id,
+    "sheets:update",
+    WRITE_RATE_LIMIT
+  );
+  if (rate.limited) {
+    return NextResponse.json(
+      {
+        error: `Çok hızlı istek gönderiyorsunuz. ${rate.retryAfterSeconds} saniye sonra tekrar deneyin.`,
+        code: "RATE_LIMIT_EXCEEDED",
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rate.retryAfterSeconds) },
+      }
+    );
   }
 
   // Verify ownership
@@ -240,6 +282,25 @@ export async function DELETE(
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rate = await enforceRateLimit(
+    supabase,
+    user.id,
+    "sheets:delete",
+    WRITE_RATE_LIMIT
+  );
+  if (rate.limited) {
+    return NextResponse.json(
+      {
+        error: `Çok hızlı istek gönderiyorsunuz. ${rate.retryAfterSeconds} saniye sonra tekrar deneyin.`,
+        code: "RATE_LIMIT_EXCEEDED",
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rate.retryAfterSeconds) },
+      }
+    );
   }
 
   const { error } = await supabase

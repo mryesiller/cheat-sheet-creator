@@ -5,6 +5,11 @@ import {
   parseCreateSheetBody,
   ValidationError,
 } from "@/lib/api/sheet-validation";
+import { enforceRateLimit } from "@/lib/api/rate-limit";
+
+const MAX_SHEETS_PER_USER = 3;
+const LIST_RATE_LIMIT = { maxRequests: 120, windowMs: 60_000 } as const;
+const CREATE_RATE_LIMIT = { maxRequests: 8, windowMs: 60_000 } as const;
 
 async function allocateUniqueSlug(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -42,6 +47,25 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const rate = await enforceRateLimit(
+    supabase,
+    user.id,
+    "sheets:list",
+    LIST_RATE_LIMIT
+  );
+  if (rate.limited) {
+    return NextResponse.json(
+      {
+        error: `Çok hızlı istek gönderiyorsunuz. ${rate.retryAfterSeconds} saniye sonra tekrar deneyin.`,
+        code: "RATE_LIMIT_EXCEEDED",
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rate.retryAfterSeconds) },
+      }
+    );
+  }
+
   const { data: sheets, error } = await supabase
     .from("cheat_sheets")
     .select(
@@ -70,6 +94,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const rate = await enforceRateLimit(
+    supabase,
+    user.id,
+    "sheets:create",
+    CREATE_RATE_LIMIT
+  );
+  if (rate.limited) {
+    return NextResponse.json(
+      {
+        error: `Çok hızlı istek gönderiyorsunuz. ${rate.retryAfterSeconds} saniye sonra tekrar deneyin.`,
+        code: "RATE_LIMIT_EXCEEDED",
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rate.retryAfterSeconds) },
+      }
+    );
+  }
+
   let body;
 
   try {
@@ -83,6 +126,28 @@ export async function POST(request: Request) {
   }
 
   const title = body.title;
+
+  const { count: existingCount, error: countError } = await supabase
+    .from("cheat_sheets")
+    .select("id", { head: true, count: "exact" })
+    .eq("user_id", user.id);
+
+  if (countError) {
+    return NextResponse.json({ error: countError.message }, { status: 500 });
+  }
+
+  if ((existingCount ?? 0) >= MAX_SHEETS_PER_USER) {
+    return NextResponse.json(
+      {
+        error:
+          "Ücretsiz planda en fazla 3 cheat sheet oluşturabilirsiniz. Yeni oluşturmak için bir tanesini silin.",
+        code: "SHEET_LIMIT_REACHED",
+        limit: MAX_SHEETS_PER_USER,
+      },
+      { status: 403 }
+    );
+  }
+
   const slug = await allocateUniqueSlug(supabase, title);
   const templateSections = body.sections;
   const templateToggles = body.toggles;
@@ -128,6 +193,7 @@ export async function POST(request: Request) {
             item_type: item.item_type,
             key_text: item.key_text,
             value_text: item.value_text,
+            variants: item.variants ?? null,
             is_new: item.is_new ?? false,
             position: ii,
           }))

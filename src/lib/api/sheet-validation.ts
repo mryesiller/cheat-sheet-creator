@@ -33,6 +33,7 @@ export interface ParsedCreateSheetBody {
       item_type: ItemType;
       key_text: string;
       value_text: string;
+      variants?: Item["variants"];
       is_new?: boolean;
     }>;
   }>;
@@ -254,6 +255,7 @@ export async function parseCreateSheetBody(request: Request): Promise<ParsedCrea
                 ),
                 key_text: asString(item.key_text, `sections[${sectionIndex}].items[${itemIndex}].key_text`),
                 value_text: asString(item.value_text, `sections[${sectionIndex}].items[${itemIndex}].value_text`),
+                variants: parseVariants(item.variants),
                 is_new: asBoolean(
                   item.is_new,
                   `sections[${sectionIndex}].items[${itemIndex}].is_new`,

@@ -66,6 +66,17 @@ body {
   color: var(--foreground);
 }
 
+button:not(:disabled),
+[role="button"],
+summary,
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 /* Keyboard key styling */
 kbd {
   display: inline-block;

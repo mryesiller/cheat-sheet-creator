@@ -1,9 +1,10 @@
-import type { SectionColor, ItemType } from "@/lib/types/database";
+import type { Item, SectionColor, ItemType } from "@/lib/types/database";
 
 export interface TemplateItem {
   item_type: ItemType;
   key_text: string;
   value_text: string;
+  variants?: Item["variants"];
   is_new?: boolean;
 }
 
