@@ -197,7 +197,7 @@ export default function DashboardContent({
         </div>
       )}
 
-      <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+      <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-200">
         Free plan limit: up to <strong>{MAX_SHEETS_PER_USER}</strong> cheat sheets.
         Current usage: <strong>{sheetList.length}</strong> /{" "}
         {MAX_SHEETS_PER_USER}
